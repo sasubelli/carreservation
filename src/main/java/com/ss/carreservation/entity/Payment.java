@@ -19,5 +19,5 @@ public class Payment {
     private Double amount;
     private String method;
     private LocalDateTime date;
-    private String status = "FAILED"; // Default status as per your Python class
+    private String status = "FAILED"; // Default status
 }
