@@ -1,18 +1,21 @@
 package com.ss.carreservation.service;
 
 import com.ss.carreservation.dto.ReservationDTO;
-import com.ss.carreservation.entity.Car;
 import com.ss.carreservation.entity.Reservation;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ReservationService {
-    Reservation createReservation(Reservation reservation);
-    List<Reservation> getAllReservations();
-    Reservation getReservationById(Long id);
-    boolean isAvailable(Long carId, LocalDate start, LocalDate end);
-    Reservation getReservationByCarId(Long carId);
-    double calculatePrice(Long carId, LocalDate start, LocalDate end);
-    void reserveCar(ReservationDTO dto);
+    List<ReservationDTO> getAllReservations();
+
+    ReservationDTO getReservationById(Long id);
+
+    boolean isAvailable(Long carId, LocalDateTime start, LocalDateTime end);
+
+    ReservationDTO getReservationByCarId(Long carId);
+
+    double calculatePrice(Long carId, LocalDateTime start, LocalDateTime end);
+
+    ReservationDTO reserveCar(Reservation dto);
 }

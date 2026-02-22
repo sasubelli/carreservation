@@ -9,12 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,59 +25,78 @@ public class ReservationServiceImpl implements ReservationService {
     private final CarRepository carRepo;
     private final Set<Long> activeLocks = ConcurrentHashMap.newKeySet();
 
+
     @Override
-    public Reservation createReservation(Reservation reservation) {
-        // Business logic: e.g., calculate total price before saving
-        return repository.save(reservation);
+    public List<ReservationDTO> getAllReservations() {
+        return repository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Reservation> getAllReservations() {
-        return repository.findAll();
+    public ReservationDTO getReservationById(Long id) {
+        return repository.findById(id)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
+
     }
 
     @Override
-    public Reservation getReservationById(Long id) {
-        return repository.findById(id).orElseThrow();
+    public ReservationDTO getReservationByCarId(Long carId) {
+        return repository.findByCarId(carId).stream()
+                .findFirst() // or .max(Comparator.comparing(Reservation::getStartDate))
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new RuntimeException("No reservations found for carId: " + carId));
     }
 
     @Override
-    public Reservation getReservationByCarId(Long carId) {
-        return repository.findByCarId(carId);
-    }
-
-    @Override
-    public boolean isAvailable(Long carId, LocalDate start, LocalDate end) {
-
-        List<Reservation> reservations = Collections.singletonList(getReservationByCarId(carId));
+    public boolean isAvailable(Long carId, LocalDateTime start, LocalDateTime end) {
+        List<Reservation> reservations = repository.findByCarId(carId);
 
         return reservations.stream()
                 .filter(res -> List.of("CONFIRMED", "PENDING").contains(res.getStatus()))
-                .noneMatch(res -> !(res.getEndDate().isBefore(start.atStartOfDay()) || res.getStartDate().isAfter(end.atStartOfDay())));
+                // Standard overlap logic: A reservation overlaps if it
+                // starts before the requested end AND ends after the requested start
+                .noneMatch(res -> res.getStartDate().isBefore(end) && res.getEndDate().isAfter(start));
     }
 
     @Override
-    public double calculatePrice(Long carId, LocalDate start, LocalDate end) {
+    public double calculatePrice(Long carId, LocalDateTime start, LocalDateTime end) {
         Car car = carRepo.findById(carId).orElseThrow();
         long days = ChronoUnit.DAYS.between(start, end) + 1;
         return car.getPricePerDay() * days;
     }
 
     @Transactional
-    public void reserveCar(ReservationDTO dto) {
+    public ReservationDTO reserveCar(Reservation reservation) {
         // Simple LockManager Logic
-        if (!activeLocks.add(dto.getCarId())) {
+        if (!activeLocks.add(reservation.getCarId())) {
             throw new RuntimeException("Resource is locked");
         }
 
         try {
-            if (!isAvailable(dto.getCarId(), dto.getStartDate(), dto.getEndDate())) {
+            if (!isAvailable(reservation.getCarId(), reservation.getStartDate(), reservation.getEndDate())) {
                 throw new RuntimeException("Car is already booked");
             }
             // Logic to save reservation...
+            repository.saveAndFlush(reservation);
 
         } finally {
-            activeLocks.remove(dto.getCarId());
+            activeLocks.remove(reservation.getCarId());
         }
+        return this.convertToDTO(reservation);
+    }
+
+    // Helper method to keep code --DRY
+    private ReservationDTO convertToDTO(Reservation reservation) {
+        return new ReservationDTO(
+                reservation.getReservationId(),
+                reservation.getCarId(),
+                reservation.getCustomer(),
+                reservation.getCar(),
+                reservation.getStartDate(),
+                reservation.getEndDate(),
+                reservation.getStatus(), reservation.getTotalPrice()
+        );
     }
 }

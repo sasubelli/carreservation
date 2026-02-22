@@ -1,12 +1,19 @@
 package com.ss.carreservation.dto;
 
-import lombok.Data;
+import com.ss.carreservation.entity.Car;
+import com.ss.carreservation.entity.Customer;
+import lombok.Builder;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Data
-public class ReservationDTO {
-    private Long carId;
-    private LocalDate startDate;
-    private LocalDate endDate;
+@Builder
+public record ReservationDTO(
+        Long reservationId,
+        Long carId,
+        Customer customer,
+        Car car,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
+        String status,
+        Double totalPrice) {
 }
