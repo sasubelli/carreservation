@@ -10,9 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/reservations")
+@RequestMapping("/api/reservation")
 public class ReservationController {
-    //bad practice need to implement using constructor injection
     private final ReservationService reservationService;
 
     public ReservationController(ReservationService service) {
@@ -46,7 +45,7 @@ public class ReservationController {
         return reservationService.isAvailable(id, startdate, enddate);
     }
 
-    @GetMapping("/caravailable/{id}/{startdate}/{enddate}")
+    @GetMapping("/price/{id}/{startdate}/{enddate}")
     double calculatePrice(@PathVariable Long id, @RequestParam LocalDateTime startdate, @RequestParam LocalDateTime enddate) {
         return reservationService.calculatePrice(id, startdate, enddate);
     }
