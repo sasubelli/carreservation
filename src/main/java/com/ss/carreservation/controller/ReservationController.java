@@ -3,6 +3,7 @@ package com.ss.carreservation.controller;
 import com.ss.carreservation.dto.ReservationDTO;
 import com.ss.carreservation.entity.Reservation;
 import com.ss.carreservation.service.ReservationService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,12 +42,16 @@ public class ReservationController {
     }
 
     @GetMapping("/caravailable/{id}/{startdate}/{enddate}")
-    boolean isAvailable(@PathVariable Long id, @RequestParam LocalDateTime startdate, @RequestParam LocalDateTime enddate) {
+    boolean isAvailable(@PathVariable Long id,
+                        @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy-HHmm") LocalDateTime startdate,
+                        @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy-HHmm") LocalDateTime enddate) {
         return reservationService.isAvailable(id, startdate, enddate);
     }
 
     @GetMapping("/price/{id}/{startdate}/{enddate}")
-    double calculatePrice(@PathVariable Long id, @RequestParam LocalDateTime startdate, @RequestParam LocalDateTime enddate) {
+    double calculatePrice(@PathVariable Long id,
+                          @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy-HHmm") LocalDateTime startdate,
+                          @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy-HHmm") LocalDateTime enddate) {
         return reservationService.calculatePrice(id, startdate, enddate);
     }
 
