@@ -112,21 +112,6 @@ class ReservationServiceTest {
         assertThrows(RuntimeException.class, () -> reservationService.reserveCar(reservation));
     }
 
-//    @Test
-//    @DisplayName("Should save reservation when valid")
-//    void testReserveCar_Success() {
-//        Reservation reservation = new Reservation();
-//        reservation.setCar(testCar);
-//        reservation.setStartDate(LocalDateTime.of(2026, 3, 1, 10, 0));
-//        reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
-//
-//        when(repository.findByCarId(1L)).thenReturn(Collections.emptyList());
-//        when(carRepo.findById(1L)).thenReturn(Optional.of(testCar));
-//
-//        reservationService.reserveCar(reservation);
-//
-//        verify(repository, times(1)).save(any(Reservation.class));
-//    }
 @Test
 @DisplayName("Should save reservation when valid")
 void testReserveCar_Success() {
