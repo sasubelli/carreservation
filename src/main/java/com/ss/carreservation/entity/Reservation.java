@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // Simplified name
+    private Long id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "customer_id")
@@ -27,7 +27,6 @@ public class Reservation {
     @Column(nullable = false)
     private LocalDateTime endDate;
 
-    // Use an Enum for status to prevent typos like "PENDING" vs "Pending"
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.PENDING;
 

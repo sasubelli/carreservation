@@ -44,6 +44,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationDTO getReservationByCarId(Long carId) {
+        //need more logic to server all scenarios
         return repository.findByCarId(carId).stream()
                 .findFirst() // or .max(Comparator.comparing(Reservation::getStartDate))
                 .map(this::convertToDTO)
