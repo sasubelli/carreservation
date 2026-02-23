@@ -112,23 +112,23 @@ class ReservationServiceTest {
         assertThrows(RuntimeException.class, () -> reservationService.reserveCar(reservation));
     }
 
-@Test
-@DisplayName("Should save reservation when valid")
-void testReserveCar_Success() {
+    @Test
+    @DisplayName("Should save reservation when valid")
+    void testReserveCar_Success() {
 
-    Long carId = 1L;
-    testCar.setCarId(carId);
+        Long carId = 1L;
+        testCar.setCarId(carId);
 
-    Reservation reservation = new Reservation();
-    reservation.setCar(testCar);
-    reservation.setStartDate(LocalDateTime.of(2026, 3, 1, 10, 0));
-    reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
+        Reservation reservation = new Reservation();
+        reservation.setCar(testCar);
+        reservation.setStartDate(LocalDateTime.of(2026, 3, 1, 10, 0));
+        reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
 
-    when(repository.findByCarId(carId)).thenReturn(Collections.emptyList());
-    when(carRepo.findById(carId)).thenReturn(Optional.of(testCar));
-    when(repository.save(any(Reservation.class))).thenReturn(reservation);
+        when(repository.findByCarId(carId)).thenReturn(Collections.emptyList());
+        when(carRepo.findById(carId)).thenReturn(Optional.of(testCar));
+        when(repository.save(any(Reservation.class))).thenReturn(reservation);
 
-    reservationService.reserveCar(reservation);
-    verify(repository, times(1)).save(any(Reservation.class));
-}
+        reservationService.reserveCar(reservation);
+        verify(repository, times(1)).save(any(Reservation.class));
+    }
 }
