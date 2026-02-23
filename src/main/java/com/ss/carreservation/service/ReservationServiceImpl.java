@@ -70,7 +70,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Transactional
     public ReservationDTO reserveCar(Reservation reservation) {
-        // Simple LockManager Logic
+        // LockManager
         if (!activeLocks.add(reservation.getCar().getCarId())) {
             throw new RuntimeException("Resource is locked");
         }
@@ -79,7 +79,6 @@ public class ReservationServiceImpl implements ReservationService {
             if (!isAvailable(reservation.getCar().getCarId(), reservation.getStartDate(), reservation.getEndDate())) {
                 throw new RuntimeException("Car is already booked");
             }
-            // Logic to save reservation...
             repository.saveAndFlush(reservation);
 
         } finally {
@@ -88,7 +87,6 @@ public class ReservationServiceImpl implements ReservationService {
         return this.convertToDTO(reservation);
     }
 
-    // Helper method to keep code --DRY
     private ReservationDTO convertToDTO(Reservation reservation) {
         return new ReservationDTO(
                 reservation.getId(),
