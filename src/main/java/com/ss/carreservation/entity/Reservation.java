@@ -6,23 +6,30 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Data
+@Entity 
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reservationId;
+    private Long id; // Simplified name
 
-    private Long carId;
-
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "car_id")
     private Car car;
 
+    @Column(nullable = false)
     private LocalDateTime startDate;
+
+    @Column(nullable = false)
     private LocalDateTime endDate;
-    private String status = "PENDING";
+
+    // Use an Enum for status to prevent typos like "PENDING" vs "Pending"
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status = ReservationStatus.PENDING;
+
     private Double totalPrice;
 }

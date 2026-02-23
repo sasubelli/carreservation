@@ -3,6 +3,7 @@ package com.ss.carreservation.service;
 import com.ss.carreservation.dto.ReservationDTO;
 import com.ss.carreservation.entity.Car;
 import com.ss.carreservation.entity.Reservation;
+import com.ss.carreservation.entity.ReservationStatus;
 import com.ss.carreservation.repository.CarRepository;
 import com.ss.carreservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -49,15 +50,15 @@ public class ReservationServiceImpl implements ReservationService {
                 .orElseThrow(() -> new RuntimeException("No reservations found for carId: " + carId));
     }
 
+
     @Override
     public boolean isAvailable(Long carId, LocalDateTime start, LocalDateTime end) {
         List<Reservation> reservations = repository.findByCarId(carId);
-
         return reservations.stream()
-                .filter(res -> List.of("CONFIRMED", "PENDING").contains(res.getStatus()))
-                // Standard overlap logic: A reservation overlaps if it
-                // starts before the requested end AND ends after the requested start
-                .noneMatch(res -> res.getStartDate().isBefore(end) && res.getEndDate().isAfter(start));
+                .filter(res -> res.getStatus() == ReservationStatus.CONFIRMED ||
+                        res.getStatus() == ReservationStatus.PENDING)
+                .noneMatch(res -> res.getStartDate().isBefore(end) &&
+                        res.getEndDate().isAfter(start));
     }
 
     @Override
@@ -70,19 +71,19 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public ReservationDTO reserveCar(Reservation reservation) {
         // Simple LockManager Logic
-        if (!activeLocks.add(reservation.getCarId())) {
+        if (!activeLocks.add(reservation.getCar().getCarId())) {
             throw new RuntimeException("Resource is locked");
         }
 
         try {
-            if (!isAvailable(reservation.getCarId(), reservation.getStartDate(), reservation.getEndDate())) {
+            if (!isAvailable(reservation.getCar().getCarId(), reservation.getStartDate(), reservation.getEndDate())) {
                 throw new RuntimeException("Car is already booked");
             }
             // Logic to save reservation...
             repository.saveAndFlush(reservation);
 
         } finally {
-            activeLocks.remove(reservation.getCarId());
+            activeLocks.remove(reservation.getCar().getCarId());
         }
         return this.convertToDTO(reservation);
     }
@@ -90,13 +91,14 @@ public class ReservationServiceImpl implements ReservationService {
     // Helper method to keep code --DRY
     private ReservationDTO convertToDTO(Reservation reservation) {
         return new ReservationDTO(
-                reservation.getReservationId(),
-                reservation.getCarId(),
+                reservation.getId(),
+                reservation.getCar().getCarId(),
                 reservation.getCustomer(),
                 reservation.getCar(),
                 reservation.getStartDate(),
                 reservation.getEndDate(),
-                reservation.getStatus(), reservation.getTotalPrice()
+                reservation.getStatus(),
+                reservation.getTotalPrice()
         );
     }
 }

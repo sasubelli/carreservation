@@ -2,6 +2,7 @@ package com.ss.carreservation.dto;
 
 import com.ss.carreservation.entity.Car;
 import com.ss.carreservation.entity.Customer;
+import com.ss.carreservation.entity.ReservationStatus;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,6 @@ public record ReservationDTO(
         Car car,
         LocalDateTime startDate,
         LocalDateTime endDate,
-        String status,
+        ReservationStatus status,
         Double totalPrice) {
 }

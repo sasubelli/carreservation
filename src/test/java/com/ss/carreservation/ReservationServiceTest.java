@@ -2,6 +2,7 @@ package com.ss.carreservation;
 
 import com.ss.carreservation.entity.Car;
 import com.ss.carreservation.entity.Reservation;
+import com.ss.carreservation.entity.ReservationStatus;
 import com.ss.carreservation.repository.CarRepository;
 import com.ss.carreservation.repository.ReservationRepository;
 import com.ss.carreservation.service.ReservationServiceImpl;
@@ -42,8 +43,8 @@ class ReservationServiceTest {
         testCar.setPricePerDay(100.0);
 
         existingBooking = new Reservation();
-        existingBooking.setCarId(1L);
-        existingBooking.setStatus("CONFIRMED");
+        existingBooking.setCar(testCar);
+        existingBooking.setStatus(ReservationStatus.CONFIRMED);
         // Setting time to 10:00 AM for existing booking
         existingBooking.setStartDate(LocalDateTime.of(2026, 3, 10, 10, 0));
         existingBooking.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
@@ -102,7 +103,7 @@ class ReservationServiceTest {
     @DisplayName("Should throw exception when car is already booked")
     void testReserveCar_Conflict() {
         Reservation reservation = new Reservation();
-        reservation.setCarId(1L);
+        reservation.setCar(testCar);
         reservation.setStartDate(LocalDateTime.of(2026, 3, 1, 10, 0));
         reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
 
@@ -111,19 +112,38 @@ class ReservationServiceTest {
         assertThrows(RuntimeException.class, () -> reservationService.reserveCar(reservation));
     }
 
-    @Test
-    @DisplayName("Should save reservation when valid")
-    void testReserveCar_Success() {
-        Reservation reservation = new Reservation();
-        reservation.setCarId(1L);
-        reservation.setStartDate(LocalDateTime.of(2026, 3, 1, 10, 0));
-        reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
+//    @Test
+//    @DisplayName("Should save reservation when valid")
+//    void testReserveCar_Success() {
+//        Reservation reservation = new Reservation();
+//        reservation.setCar(testCar);
+//        reservation.setStartDate(LocalDateTime.of(2026, 3, 1, 10, 0));
+//        reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
+//
+//        when(repository.findByCarId(1L)).thenReturn(Collections.emptyList());
+//        when(carRepo.findById(1L)).thenReturn(Optional.of(testCar));
+//
+//        reservationService.reserveCar(reservation);
+//
+//        verify(repository, times(1)).save(any(Reservation.class));
+//    }
+@Test
+@DisplayName("Should save reservation when valid")
+void testReserveCar_Success() {
 
-        when(repository.findByCarId(1L)).thenReturn(Collections.emptyList());
-        when(carRepo.findById(1L)).thenReturn(Optional.of(testCar));
+    Long carId = 1L;
+    testCar.setCarId(carId);
 
-        reservationService.reserveCar(reservation);
+    Reservation reservation = new Reservation();
+    reservation.setCar(testCar);
+    reservation.setStartDate(LocalDateTime.of(2026, 3, 1, 10, 0));
+    reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
 
-        verify(repository, times(1)).save(any(Reservation.class));
-    }
+    when(repository.findByCarId(carId)).thenReturn(Collections.emptyList());
+    when(carRepo.findById(carId)).thenReturn(Optional.of(testCar));
+    when(repository.save(any(Reservation.class))).thenReturn(reservation);
+
+    reservationService.reserveCar(reservation);
+    verify(repository, times(1)).save(any(Reservation.class));
+}
 }
