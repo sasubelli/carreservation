@@ -1,5 +1,7 @@
 package com.ss.carreservation.dto;
 
+import java.math.BigDecimal;
+
 public record CarDTO(
         Long carId,
         String make,
@@ -7,6 +9,6 @@ public record CarDTO(
         int year,
         String carType,
         String location,
-        double pricePerDay
+        BigDecimal pricePerDay
 ) {
 }

@@ -1,7 +1,13 @@
 package com.ss.carreservation.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "cars")
@@ -16,6 +22,6 @@ public class Car {
     private int year;
     private String carType;
     private String location;
-    private double pricePerDay;
+    private BigDecimal pricePerDay;
     private boolean isActive = true;
 }
