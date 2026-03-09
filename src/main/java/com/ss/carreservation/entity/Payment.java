@@ -3,6 +3,7 @@ package com.ss.carreservation.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,7 +17,7 @@ public class Payment {
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
-    private Double amount;
+    private BigDecimal amount;
     private String method;
     private LocalDateTime date;
     private String status = "FAILED"; // Default status

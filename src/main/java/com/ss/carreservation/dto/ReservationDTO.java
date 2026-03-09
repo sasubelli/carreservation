@@ -16,5 +16,5 @@ public record ReservationDTO(
         LocalDateTime startDate,
         LocalDateTime endDate,
         ReservationStatus status,
-        Double totalPrice) {
+        java.math.BigDecimal totalPrice) {
 }

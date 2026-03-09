@@ -4,6 +4,7 @@ package com.ss.carreservation.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -30,5 +31,5 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.PENDING;
 
-    private Double totalPrice;
+    private BigDecimal totalPrice;
 }

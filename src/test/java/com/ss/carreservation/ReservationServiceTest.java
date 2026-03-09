@@ -75,7 +75,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("Should return true when new booking ends before existing starts")
+    @DisplayName("Should return true when new booking ends before new starts")
     void testIsAvailable_BeforeExisting() {
         when(repository.findByCarId(1L)).thenReturn(List.of(existingBooking));
 
