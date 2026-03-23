@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -63,10 +64,10 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public double calculatePrice(Long carId, LocalDateTime start, LocalDateTime end) {
+    public BigDecimal calculatePrice(Long carId, LocalDateTime start, LocalDateTime end) {
         Car car = carRepo.findById(carId).orElseThrow();
         long days = ChronoUnit.DAYS.between(start, end) + 1;
-        return car.getPricePerDay() * days;
+        return car.getPricePerDay().multiply(BigDecimal.valueOf(days) ) ;
     }
 
     @Transactional

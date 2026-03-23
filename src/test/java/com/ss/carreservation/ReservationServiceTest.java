@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +41,7 @@ class ReservationServiceTest {
     void setUp() {
         testCar = new Car();
         testCar.setCarId(1L);
-        testCar.setPricePerDay(100.0);
+        testCar.setPricePerDay(BigDecimal.valueOf(100.0));
 
         existingBooking = new Reservation();
         existingBooking.setCar(testCar);
@@ -92,7 +93,7 @@ class ReservationServiceTest {
         when(carRepo.findById(1L)).thenReturn(Optional.of(testCar));
 
         // Note: Logic depends on if your service uses ChronoUnit.DAYS between start/end
-        double price = reservationService.calculatePrice(1L,
+        BigDecimal price = reservationService.calculatePrice(1L,
                 LocalDateTime.of(2026, 3, 1, 10, 0),
                 LocalDateTime.of(2026, 3, 3, 10, 0));
 
