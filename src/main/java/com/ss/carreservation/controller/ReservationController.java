@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,9 +50,9 @@ public class ReservationController {
     }
 
     @GetMapping("/price/{id}/{startdate}/{enddate}")
-    double calculatePrice(@PathVariable Long id,
-                          @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy-HHmm") LocalDateTime startdate,
-                          @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy-HHmm") LocalDateTime enddate) {
+    BigDecimal calculatePrice(@PathVariable Long id,
+                              @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy-HHmm") LocalDateTime startdate,
+                              @PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy-HHmm") LocalDateTime enddate) {
         return reservationService.calculatePrice(id, startdate, enddate);
     }
 
