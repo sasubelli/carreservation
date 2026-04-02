@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -46,7 +47,6 @@ class ReservationServiceTest {
         existingBooking = new Reservation();
         existingBooking.setCar(testCar);
         existingBooking.setStatus(ReservationStatus.CONFIRMED);
-        // Setting time to 10:00 AM for existing booking
         existingBooking.setStartDate(LocalDateTime.of(2026, 3, 10, 10, 0));
         existingBooking.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
     }
@@ -76,7 +76,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("Should return true when new booking ends before new starts")
+    @DisplayName("Should return true when new booking ends before existing starts")
     void testIsAvailable_BeforeExisting() {
         when(repository.findByCarId(1L)).thenReturn(List.of(existingBooking));
 
@@ -88,16 +88,29 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("Should return true when new booking starts exactly when existing ends")
+    void testIsAvailable_StartsOnExistingEndDate() {
+        when(repository.findByCarId(1L)).thenReturn(List.of(existingBooking));
+
+        boolean result = reservationService.isAvailable(1L,
+                LocalDateTime.of(2026, 3, 15, 10, 0),
+                LocalDateTime.of(2026, 3, 20, 10, 0));
+
+        assertTrue(result);
+    }
+
+    @Test
     @DisplayName("Should calculate correct price for 3 day booking")
     void testCalculatePrice() {
-        when(carRepo.findById(1L)).thenReturn(Optional.of(testCar));
+        // FIX: restored stub — calculatePrice calls carRepo.findById internally.
+        // Without this, Optional is empty and the service throws NoSuchElementException.
+        when(carRepo.findById(any(Long.class))).thenReturn(Optional.of(testCar));
 
-        // Note: Logic depends on if your service uses ChronoUnit.DAYS between start/end
         BigDecimal price = reservationService.calculatePrice(1L,
                 LocalDateTime.of(2026, 3, 1, 10, 0),
                 LocalDateTime.of(2026, 3, 3, 10, 0));
 
-        assertEquals(300.0, price);
+        assertThat(price).isEqualByComparingTo(BigDecimal.valueOf(300.0));
     }
 
     @Test
@@ -105,7 +118,7 @@ class ReservationServiceTest {
     void testReserveCar_Conflict() {
         Reservation reservation = new Reservation();
         reservation.setCar(testCar);
-        reservation.setStartDate(LocalDateTime.of(2026, 3, 1, 10, 0));
+        reservation.setStartDate(LocalDateTime.of(2026, 3, 10, 10, 0));
         reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
 
         when(repository.findByCarId(1L)).thenReturn(List.of(existingBooking));
@@ -116,20 +129,16 @@ class ReservationServiceTest {
     @Test
     @DisplayName("Should save reservation when valid")
     void testReserveCar_Success() {
-
-        Long carId = 1L;
-        testCar.setCarId(carId);
-
         Reservation reservation = new Reservation();
         reservation.setCar(testCar);
         reservation.setStartDate(LocalDateTime.of(2026, 3, 1, 10, 0));
         reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
 
-        when(repository.findByCarId(carId)).thenReturn(Collections.emptyList());
-        when(carRepo.findById(carId)).thenReturn(Optional.of(testCar));
-        when(repository.save(any(Reservation.class))).thenReturn(reservation);
+        when(repository.findByCarId(1L)).thenReturn(Collections.emptyList());
+        when(repository.saveAndFlush(any(Reservation.class))).thenReturn(reservation);
 
         reservationService.reserveCar(reservation);
-        verify(repository, times(1)).save(any(Reservation.class));
+
+        verify(repository, times(1)).saveAndFlush(any(Reservation.class));
     }
 }
