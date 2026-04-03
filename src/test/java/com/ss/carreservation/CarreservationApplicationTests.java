@@ -69,7 +69,7 @@ class CarreservationApplicationTests {
 		reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
 		reservationRepository.save(reservation);
 
-		List<Reservation> results = reservationRepository.findByCarId(testCar.getCarId());
+		List<Reservation> results = reservationRepository.findByCar_CarId(testCar.getCarId());
 
 		assertThat(results).hasSize(1);
 		assertThat(results.get(0).getStatus()).isEqualTo(ReservationStatus.CONFIRMED);
@@ -79,7 +79,7 @@ class CarreservationApplicationTests {
 	@Test
 	@DisplayName("Should return empty list when no reservations exist for car")
 	void shouldReturnEmptyWhenNoReservations() {
-		List<Reservation> results = reservationRepository.findByCarId(testCar.getCarId());
+		List<Reservation> results = reservationRepository.findByCar_CarId(testCar.getCarId());
 
 		assertThat(results).isEmpty();
 	}
@@ -111,7 +111,7 @@ class CarreservationApplicationTests {
 		reservationRepository.save(r1);
 		reservationRepository.save(r2);
 
-		List<Reservation> results = reservationRepository.findByCarId(testCar.getCarId());
+		List<Reservation> results = reservationRepository.findByCar_CarId(testCar.getCarId());
 
 		assertThat(results).hasSize(2);
 	}

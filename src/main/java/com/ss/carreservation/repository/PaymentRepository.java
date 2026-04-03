@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // You can add custom queries here, e.g., find payments by reservation ID
-    Optional<Payment> findByReservationReservationId(Long reservationId);
+    Optional<Payment>  findByReservation_Id(Long reservationId);
 }

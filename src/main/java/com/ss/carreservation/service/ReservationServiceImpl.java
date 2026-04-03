@@ -36,17 +36,17 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public ReservationDTO getReservationById(Long id) {
-        return repository.findById(id)
+    public ReservationDTO getReservationById(Long carId) {
+        return repository.findById(carId)
                 .map(this::convertToDTO)
-                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + carId));
 
     }
 
     @Override
     public ReservationDTO getReservationByCarId(Long carId) {
         //need more logic to server all scenarios
-        return repository.findByCarId(carId).stream()
+        return repository.findByCar_CarId(carId).stream()
                 .findFirst() // or .max(Comparator.comparing(Reservation::getStartDate))
                 .map(this::convertToDTO)
                 .orElseThrow(() -> new RuntimeException("No reservations found for carId: " + carId));
@@ -55,7 +55,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public boolean isAvailable(Long carId, LocalDateTime start, LocalDateTime end) {
-        List<Reservation> reservations = repository.findByCarId(carId);
+        List<Reservation> reservations = repository.findByCar_CarId(carId);
         return reservations.stream()
                 .filter(res -> res.getStatus() == ReservationStatus.CONFIRMED ||
                         res.getStatus() == ReservationStatus.PENDING)

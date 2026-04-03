@@ -54,7 +54,7 @@ class ReservationServiceTest {
     @Test
     @DisplayName("Should return true when car has no reservations")
     void testIsAvailable_NoReservations() {
-        when(repository.findByCarId(1L)).thenReturn(Collections.emptyList());
+        when(repository.findByCar_CarId(1L)).thenReturn(Collections.emptyList());
 
         boolean result = reservationService.isAvailable(1L,
                 LocalDateTime.of(2026, 3, 1, 10, 0),
@@ -66,7 +66,7 @@ class ReservationServiceTest {
     @Test
     @DisplayName("Should return false when dates overlap exactly")
     void testIsAvailable_ExactOverlap() {
-        when(repository.findByCarId(1L)).thenReturn(List.of(existingBooking));
+        when(repository.findByCar_CarId(1L)).thenReturn(List.of(existingBooking));
 
         boolean result = reservationService.isAvailable(1L,
                 LocalDateTime.of(2026, 3, 10, 10, 0),
@@ -78,7 +78,7 @@ class ReservationServiceTest {
     @Test
     @DisplayName("Should return true when new booking ends before existing starts")
     void testIsAvailable_BeforeExisting() {
-        when(repository.findByCarId(1L)).thenReturn(List.of(existingBooking));
+        when(repository.findByCar_CarId(1L)).thenReturn(List.of(existingBooking));
 
         boolean result = reservationService.isAvailable(1L,
                 LocalDateTime.of(2026, 3, 1, 10, 0),
@@ -90,7 +90,7 @@ class ReservationServiceTest {
     @Test
     @DisplayName("Should return true when new booking starts exactly when existing ends")
     void testIsAvailable_StartsOnExistingEndDate() {
-        when(repository.findByCarId(1L)).thenReturn(List.of(existingBooking));
+        when(repository.findByCar_CarId(1L)).thenReturn(List.of(existingBooking));
 
         boolean result = reservationService.isAvailable(1L,
                 LocalDateTime.of(2026, 3, 15, 10, 0),
@@ -121,7 +121,7 @@ class ReservationServiceTest {
         reservation.setStartDate(LocalDateTime.of(2026, 3, 10, 10, 0));
         reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
 
-        when(repository.findByCarId(1L)).thenReturn(List.of(existingBooking));
+        when(repository.findByCar_CarId(1L)).thenReturn(List.of(existingBooking));
 
         assertThrows(RuntimeException.class, () -> reservationService.reserveCar(reservation));
     }
@@ -134,7 +134,7 @@ class ReservationServiceTest {
         reservation.setStartDate(LocalDateTime.of(2026, 3, 1, 10, 0));
         reservation.setEndDate(LocalDateTime.of(2026, 3, 15, 10, 0));
 
-        when(repository.findByCarId(1L)).thenReturn(Collections.emptyList());
+        when(repository.findByCar_CarId(1L)).thenReturn(Collections.emptyList());
         when(repository.saveAndFlush(any(Reservation.class))).thenReturn(reservation);
 
         reservationService.reserveCar(reservation);
