@@ -10,6 +10,5 @@ public record CarDTO(
         String carType,
         String location,
         BigDecimal pricePerDay
-)
-{
+) {
 }
